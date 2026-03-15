@@ -1,0 +1,61 @@
+{
+  "name": "safety-guard",
+  "displayName": "OpenClaw Safety Guard",
+  "version": "1.0.0",
+  "description": "Security guard skill for analyzing user input and detecting harmful content, risky commands, and security threats before invoking LLM",
+  "author": "John-niu-07",
+  "license": "MIT",
+  "homepage": "https://github.com/John-niu-07/openclaw-safety-guard-skill",
+  "keywords": [
+    "security",
+    "safety",
+    "guard",
+    "content-filter",
+    "prompt-injection",
+    "moderation"
+  ],
+  "main": "SKILL.md",
+  "scripts": {
+    "check": "./safety-check",
+    "config": "./safety-config",
+    "log": "./safety-log"
+  },
+  "bin": [
+    "safety-check",
+    "safety-config",
+    "safety-log"
+  ],
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "INSTALL.md",
+    "USAGE-GUIDE.md",
+    "_meta.json",
+    "scripts/",
+    "config/",
+    "rules/",
+    "audit/",
+    "classifiers/",
+    "guardrail.py",
+    "safety-check",
+    "safety-config",
+    "safety-log",
+    "references/"
+  ],
+  "engines": {
+    "openclaw": ">=2026.3.0",
+    "python": ">=3.10",
+    "node": ">=16"
+  },
+  "dependencies": {
+    "python_packages": ["PyYAML"]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/John-niu-07/openclaw-safety-guard-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/John-niu-07/openclaw-safety-guard-skill/issues"
+  },
+  "changelog": "Initial release: Core safety guard functionality with prompt injection detection, harmful content filtering, dangerous command blocking, and audit logging"
+}

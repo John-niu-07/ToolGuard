@@ -11,6 +11,9 @@ env/
 dist/
 build/
 
+# ClawHub
+.clawhub/
+
 # 审计日志（包含敏感信息）
 audit/*.log
 audit/safety_audit.log
