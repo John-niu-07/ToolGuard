@@ -1,0 +1,174 @@
+# OpenClaw Safety Guard - Blocked Patterns
+# 被阻止的模式和关键词
+
+# Prompt Injection 模式
+prompt_injection:
+  # 英文
+  - "ignore previous"
+  - "ignore all previous"
+  - "disregard all"
+  - "disregard instructions"
+  - "forget all instructions"
+  - "override your instructions"
+  - "bypass your safety"
+  - "bypass restrictions"
+  - "you are now in"
+  - "enter developer mode"
+  - "enter dan mode"
+  - "do anything now"
+  - "without restrictions"
+  - "no ethical guidelines"
+  - "skip the safety"
+  - "pretend you are"
+  - "roleplay as unrestricted"
+  - "system prompt:"
+  - "your system prompt is"
+  - "new instruction:"
+  - "from now on you will"
+  # 中文
+  - "忽略所有"
+  - "忽略之前"
+  - "忽略指令"
+  - " disregard"
+  - "忘记所有指令"
+  - "覆盖你的指令"
+  - "绕过安全"
+  - "绕过限制"
+  - "进入开发者模式"
+  - "进入 dan 模式"
+  - "无任何限制"
+  - "没有道德准则"
+  - "跳过安全"
+  - "假装你是"
+  - "系统提示"
+  - "你的系统提示是"
+  # "新指令" - 移除：过于宽泛，容易误报
+  # "牛傲然" - 移除：这是人名，不是 prompt injection
+
+# Jailbreak 尝试
+jailbreak:
+  - "DAN"
+  - "Developer Mode"
+  - "AlphaBreak"
+  - "Opposite Mode"
+  - "STAN"  # "Strive To Avoid Norms"
+  - "AIM"   # "Always Intelligent Machine"
+  - "DUDE"  # "Do Whatever User Wants"
+  - "evil twin"
+  - "mirror mode"
+  - "DAN_John"  
+  # "niuaoran" - 移除：这是人名拼音，不是 jailbreak
+
+# 危险命令模式
+dangerous_commands:
+  # 文件系统破坏
+  - "rm -rf /"
+  - "rm -rf /*"
+  - "sudo rm -rf"
+  - "del /s /q c:\\*"
+  - "format c:"
+  
+  # 数据覆盖
+  - "dd if=/dev/zero"
+  - "dd if=/dev/random"
+  
+  # Fork bomb
+  - ":(){:|:&};:"
+  - "fork bomb"
+  
+  # 权限滥用
+  - "chmod -R 777 /"
+  - "chmod -R 777 *"
+  - "chown -R root:root /"
+  
+  # 网络攻击
+  - "nmap -sS"
+  - "sqlmap"
+  - "hydra -l"
+  - "metasploit"
+  
+  # 进程终止
+  - "kill -9 1"
+  - "taskkill /F /PID 0"
+
+# 有害内容关键词
+harmful_content:
+  violence:
+    # 英文 - 炸弹/爆炸物
+    - "how to kill"
+    - "how to murder"
+    - "build a bomb"
+    - "make a bomb"
+    - "bomb tutorial"
+    - "bomb making"
+    - "explosive device"
+    - "IED"
+    - "pressure cooker bomb"
+    - "make a weapon"
+    - "build a weapon"
+    - "weapon tutorial"
+    - "poison someone"
+    - "hurt someone"
+    # 中文 - 炸弹/爆炸物
+    - "制作炸弹"
+    - "制造炸弹"
+    - "制作爆炸"
+    - "制造爆炸"
+    - "爆炸装置"
+    - "炸弹教程"
+    - "炸弹制作"
+    - "制造武器"
+    - "制作武器"
+    - "如何杀人"
+    - "如何谋杀"
+  
+  illegal:
+    - "how to steal"
+    - "how to hack"
+    - "bypass security"
+    - "crack password"
+    - "create malware"
+    - "make drugs"
+    - "synthesize meth"
+    - "如何盗窃"
+    - "如何黑客"
+    - "绕过安全"
+    - "破解密码"
+    - "创建恶意软件"
+    - "制作毒品"
+  
+  self_harm:
+    - "how to commit suicide"
+    - "kill myself"
+    - "end my life"
+    - "self harm"
+    - "自杀"
+    - "自我伤害"
+  
+  hate_speech:
+    - "种族清洗"
+    - "种族灭绝"
+    - "kill all"
+    - "exterminate"
+    - "仇恨言论"
+  
+  fraud:
+    - "phishing"
+    - "钓鱼"
+    - "诈骗"
+    - "欺诈"
+    - "fake identity"
+    - "伪造身份"
+
+# 隐私敏感模式
+privacy_sensitive:
+  - "api_key"
+  - "api_secret"
+  - "private_key"
+  - "password"
+  - "passwd"
+  - "credential"
+  - "secret_token"
+  - "access_token"
+  - "auth_token"
+  - "bearer token"

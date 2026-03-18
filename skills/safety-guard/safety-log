@@ -1,0 +1,14 @@
+#!/bin/bash
+# OpenClaw Safety Guard - Audit Log Viewer Wrapper
+# 用法：safety-log [--limit N] [--filter TYPE] [--follow] [--json]
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_SCRIPT="$SCRIPT_DIR/scripts/safety_log.py"
+
+# 检查 Python 虚拟环境
+if [ -f "$SCRIPT_DIR/../openclaw-safety-guard/venv/bin/activate" ]; then
+    source "$SCRIPT_DIR/../openclaw-safety-guard/venv/bin/activate"
+fi
+
+# 执行 Python 脚本
+python3 "$PYTHON_SCRIPT" "$@"

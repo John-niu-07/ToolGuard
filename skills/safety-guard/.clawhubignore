@@ -1,0 +1,25 @@
+# ClawHub ignore file
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+audit/*.log
+
+# Temporary files
+*.tmp
+*.bak

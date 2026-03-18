@@ -1,0 +1,9 @@
+{
+  "name": "safety-guard",
+  "displayName": "OpenClaw Safety Guard",
+  "version": "1.0.0",
+  "description": "Security guard skill for analyzing user input and detecting harmful content, risky commands, and security threats before invoking LLM",
+  "author": "John-niu-07",
+  "license": "MIT",
+  "main": "SKILL.md"
+}

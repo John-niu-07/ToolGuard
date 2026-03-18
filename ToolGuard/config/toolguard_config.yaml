@@ -1,0 +1,77 @@
+# ToolGuard 配置文件
+
+# 基本设置
+general:
+  enabled: true
+  log_level: INFO
+  log_file: ~/.openclaw/workspace/ToolGuard/logs/toolguard.log
+  audit_file: ~/.openclaw/workspace/ToolGuard/logs/audit.jsonl
+
+# 确认设置
+confirmation:
+  # 默认超时时间（秒）
+  default_timeout: 300
+  
+  # 超时后自动拒绝
+  auto_deny_on_timeout: true
+  
+  # 确认方式：web / cli / both
+  confirmation_method: web
+  
+  # Web 界面设置
+  web:
+    enabled: true
+    host: 127.0.0.1
+    port: 8767  # ToolGuard Web 界面端口
+
+# Risk Tool 设置
+risk_tools:
+  # 配置文件路径
+  config_file: ~/.openclaw/workspace/ToolGuard/config/risk_tool_list.json
+  
+  # 匹配模式：exact / regex
+  match_mode: exact
+  
+  # 是否区分大小写
+  case_sensitive: false
+
+# 审计日志设置
+audit:
+  # 记录所有工具调用（包括安全的）
+  log_all_calls: false
+  
+  # 记录确认请求
+  log_confirmations: true
+  
+  # 记录用户响应
+  log_responses: true
+  
+  # 日志保留天数
+  retention_days: 30
+  
+  # 日志格式：json / text
+  format: json
+
+# 通知设置
+notifications:
+  # 高风险操作通知
+  high_risk_notification: true
+  
+  # 通知方式：web / email / none
+  method: web
+
+# 高级设置
+advanced:
+  # 允许用户添加自定义 Risk Tool
+  allow_custom_risk_tools: true
+  
+  # 允许临时放行（本次会话有效）
+  allow_temporary_approval: true
+  
+  # 临时放行超时（秒）
+  temporary_approval_timeout: 3600
+  
+  # 白名单机制
+  whitelist:
+    enabled: false
+    file: ~/.openclaw/workspace/ToolGuard/config/whitelist.json

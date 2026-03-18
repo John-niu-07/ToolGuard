@@ -1,0 +1,75 @@
+# OpenClaw Safety Guard Configuration
+# 安全护栏配置文件
+
+# 风险阈值 (0.0 - 1.0)
+thresholds:
+  low_risk: 0.25     # 低于此值直接放行
+  medium_risk: 0.5   # 高于此值需要用户确认
+  high_risk: 0.75    # 高于此值直接拒绝
+
+# 检测器配置
+detectors:
+  # Prompt 注入检测
+  prompt_injection:
+    enabled: true
+    model: "vijil/mbert-prompt-injection"  # Vijil 多语言 Prompt 注入检测
+    threshold: 0.65
+  
+  # 有害内容检测
+  harmful_content:
+    enabled: true
+    categories:
+      - violence
+      - illegal
+      - hate_speech
+      - self_harm
+      - sexual_explicit
+    
+  # 隐私泄露检测
+  privacy_leak:
+    enabled: true
+    detect_patterns:
+      - api_key
+      - password
+      - secret
+      - token
+      - credential
+  
+  # 危险命令检测
+  dangerous_command:
+    enabled: true
+    block_patterns:
+      - "rm -rf /"
+      - "sudo rm -rf"
+      - "dd if=/dev/zero"
+      - ":(){:|:&};:"  # fork bomb
+      - "chmod -R 777"
+
+# 响应模式
+response_mode:
+  # blocked: 直接拒绝
+  # warn: 警告并请求确认
+  # silent: 静默记录（用于调试）
+  default: "warn"
+  
+  # 按风险级别覆盖
+  overrides:
+    high_risk: "blocked"
+    medium_risk: "warn"
+    low_risk: "silent"
+
+# 审计日志
+audit:
+  enabled: true
+  log_file: "audit/safety_audit.log"
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  retention_days: 30
+  log_blocked: true
+  log_allowed: false  # 设为 true 会记录所有请求（隐私考虑）
+
+# 误报处理
+false_positive:
+  # 允许用户申诉的窗口（秒）
+  appeal_window: 300
+  # 自动学习误报模式
+  auto_learn: false  # 生产环境建议关闭

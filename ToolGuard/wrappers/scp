@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""
+ToolGuard Wrapper for scp CLI
+
+监控 SCP 文件传输，防止数据泄露
+"""
+
+import subprocess
+import sys
+import json
+import http.client
+import os
+from pathlib import Path
+
+TOOLGUARD_HOST = '127.0.0.1'
+TOOLGUARD_PORT = 8767
+TIMEOUT = 5
+REAL_SCP = '/usr/bin/scp'
+
+def check_toolguard():
+    """检查 ToolGuard 是否允许执行"""
+    args = sys.argv[1:]
+    command = ' '.join(['scp'] + args)
+    
+    # 判断传输方向
+    has_remote_src = any(':' in arg for arg in args[:-1])
+    has_remote_dst = ':' in args[-1] if args else False
+    
+    if has_remote_dst:
+        risk_level = 'high'
+        reason = 'SCP 上传文件到远程服务器，可能泄露敏感数据'
+    elif has_remote_src:
+        risk_level = 'medium'
+        reason = 'SCP 从远程服务器下载文件'
+    else:
+        risk_level = 'low'
+        reason = 'SCP 本地文件传输'
+    
+    try:
+        conn = http.client.HTTPConnection(TOOLGUARD_HOST, TOOLGUARD_PORT, timeout=TIMEOUT)
+        conn.request('POST', '/check', json.dumps({
+            'tool_name': 'scp',
+            'action': 'transfer',
+            'parameters': {
+                'command': command,
+                'args': args,
+                'has_remote_dst': has_remote_dst,
+                'has_remote_src': has_remote_src
+            }
+        }), {'Content-Type': 'application/json'})
+        
+        response = conn.getresponse()
+        data = json.loads(response.read().decode())
+        conn.close()
+        
+        if data.get('need_confirmation'):
+            print(f"\n🛡️ ToolGuard 拦截：{command}")
+            print(f"   原因：{data.get('reason', reason)}")
+            print(f"   风险等级：{data.get('risk_level', risk_level)}")
+            print(f"   确认 ID: {data.get('confirmation_id')}")
+            print(f"\n请在 Web 界面确认：http://{TOOLGUARD_HOST}:{TOOLGUARD_PORT}")
+            
+            import time
+            start_time = time.time()
+            timeout = 300
+            
+            while time.time() - start_time < timeout:
+                try:
+                    conn = http.client.HTTPConnection(TOOLGUARD_HOST, TOOLGUARD_PORT, timeout=TIMEOUT)
+                    conf_id = data.get('confirmation_id')
+                    conn.request('GET', f'/api/confirmation/{conf_id}')
+                    response = conn.getresponse()
+                    status_data = json.loads(response.read().decode())
+                    conn.close()
+                    
+                    status = status_data.get('status')
+                    if status == 'approved':
+                        print("✅ 用户已允许，继续执行...\n")
+                        return True
+                    elif status == 'denied':
+                        print("❌ 用户已拒绝，终止执行")
+                        sys.exit(1)
+                    elif status == 'expired':
+                        print("⏰ 确认已超时，终止执行")
+                        sys.exit(1)
+                except Exception:
+                    pass
+                time.sleep(2)
+            
+            print("⏰ 等待确认超时，终止执行")
+            sys.exit(1)
+        
+        return True
+        
+    except Exception as e:
+        print(f"⚠️ ToolGuard 检查失败：{e}，继续执行...")
+        return True
+
+def main():
+    check_toolguard()
+    
+    scp_path = REAL_SCP
+    if not Path(scp_path).exists():
+        result = subprocess.run(['which', 'scp'], capture_output=True, text=True)
+        if result.returncode == 0:
+            scp_path = result.stdout.strip()
+    
+    try:
+        result = subprocess.run([scp_path] + sys.argv[1:])
+        sys.exit(result.returncode)
+    except FileNotFoundError:
+        print(f"❌ 找不到 scp: {scp_path}")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n⚠️ 用户中断")
+        sys.exit(130)
+
+if __name__ == '__main__':
+    main()

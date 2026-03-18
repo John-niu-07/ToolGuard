@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="crayfish" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b6b"/>
+      <stop offset="100%" style="stop-color:#ee5a5a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d9ff"/>
+      <stop offset="100%" style="stop-color:#0099cc"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg)" stroke="#00d9ff" stroke-width="4"/>
+  
+  <!-- Outer decorative ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#00d9ff" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Crayfish Body -->
+  <g filter="url(#glow)">
+    <!-- Main body (segmented) -->
+    <ellipse cx="256" cy="280" rx="70" ry="50" fill="url(#crayfish)"/>
+    <ellipse cx="256" cy="260" rx="60" ry="40" fill="url(#crayfish)"/>
+    <ellipse cx="256" cy="240" rx="50" ry="35" fill="url(#crayfish)"/>
+    
+    <!-- Head -->
+    <ellipse cx="256" cy="210" rx="55" ry="45" fill="url(#crayfish)"/>
+    
+    <!-- Eyes on stalks -->
+    <circle cx="230" cy="185" r="12" fill="url(#crayfish)"/>
+    <circle cx="230" cy="185" r="6" fill="#ffffff"/>
+    <circle cx="282" cy="185" r="12" fill="url(#crayfish)"/>
+    <circle cx="282" cy="185" r="6" fill="#ffffff"/>
+    
+    <!-- Antennae -->
+    <path d="M 220 190 Q 180 140 160 120" stroke="url(#crayfish)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 292 190 Q 332 140 352 120" stroke="url(#crayfish)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    
+    <!-- Big claws (the "Claw" in OpenClaw!) -->
+    <path d="M 200 250 Q 150 260 130 240 Q 120 230 135 220 Q 155 210 180 230" 
+          fill="url(#crayfish)" stroke="#cc4444" stroke-width="2"/>
+    <path d="M 312 250 Q 362 260 382 240 Q 392 230 377 220 Q 357 210 332 230" 
+          fill="url(#crayfish)" stroke="#cc4444" stroke-width="2"/>
+    
+    <!-- Small legs (simplified) -->
+    <path d="M 210 300 L 190 320" stroke="url(#crayfish)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 230 310 L 215 335" stroke="url(#crayfish)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 282 310 L 297 335" stroke="url(#crayfish)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 302 300 L 322 320" stroke="url(#crayfish)" stroke-width="5" stroke-linecap="round"/>
+    
+    <!-- Tail fan -->
+    <path d="M 256 330 L 230 370 L 256 360 L 282 370 Z" fill="url(#crayfish)"/>
+  </g>
+  
+  <!-- Tech accent circle -->
+  <circle cx="256" cy="256" r="100" fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Small tech dots -->
+  <circle cx="256" cy="140" r="5" fill="#00d9ff"/>
+  <circle cx="376" cy="256" r="5" fill="#00d9ff"/>
+  <circle cx="256" cy="372" r="5" fill="#00d9ff"/>
+  <circle cx="136" cy="256" r="5" fill="#00d9ff"/>
+  
+  <!-- Text -->
+  <text x="256" y="460" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+        fill="#00d9ff" text-anchor="middle" letter-spacing="3">OPENCLAW</text>
+</svg>

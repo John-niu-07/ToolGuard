@@ -1,0 +1,134 @@
+# OpenClaw Safety Guard - Security Policies
+# 安全策略定义
+
+policies:
+  # 策略 1: 禁止指令覆盖
+  - id: "POL-001"
+    name: "no_instruction_override"
+    description: "禁止用户尝试覆盖或修改系统指令"
+    severity: "high"
+    patterns:
+      - "ignore previous"
+      - "disregard instructions"
+      - "override your"
+    action: "block"
+    message: |
+      ⚠️ **安全提醒**
+      
+      检测到您试图修改我的系统指令。这是不被允许的操作。
+      
+      如果您有合法需求，请直接告诉我您想要什么，我会尽力在安全范围内帮助您。
+
+  # 策略 2: 禁止危险命令执行
+  - id: "POL-002"
+    name: "no_dangerous_commands"
+    description: "禁止执行可能破坏系统或数据的命令"
+    severity: "high"
+    patterns:
+      - "rm -rf"
+      - "sudo rm"
+      - "format"
+      - "dd if="
+    action: "block"
+    message: |
+      ⚠️ **危险命令拦截**
+      
+      您请求的命令可能导致系统或数据损坏。
+      
+      命令：`{command}`
+      风险：{risk_description}
+      
+      如果您确认了解风险并需要执行，请在本地终端手动运行。
+
+  # 策略 3: 防止隐私泄露
+  - id: "POL-003"
+    name: "prevent_privacy_leak"
+    description: "防止敏感信息泄露"
+    severity: "medium"
+    patterns:
+      - "show me your api"
+      - "what is your secret"
+      - "your config"
+    action: "warn"
+    message: |
+      ⚠️ **隐私保护提醒**
+      
+      我无法分享系统配置、API 密钥或其他敏感信息。
+      
+      这是为了保护您和系统的安全。
+
+  # 策略 4: 有害内容过滤
+  - id: "POL-004"
+    name: "no_harmful_content"
+    description: "不生成暴力、违法、仇恨等内容"
+    severity: "high"
+    categories:
+      - violence
+      - illegal
+      - hate_speech
+      - self_harm
+    action: "block"
+    message: |
+      ⚠️ **内容安全提醒**
+      
+      我无法提供涉及 {category} 的信息或指导。
+      
+      如果您遇到困难或需要帮助，请考虑联系专业人士或相关机构。
+
+  # 策略 5: 防止社会工程攻击
+  - id: "POL-005"
+    name: "no_social_engineering"
+    description: "不协助欺诈、钓鱼等社会工程攻击"
+    severity: "high"
+    patterns:
+      - "write a phishing email"
+      - "fake identity"
+      - "impersonate"
+      - "scam"
+    action: "block"
+    message: |
+      ⚠️ **安全提醒**
+      
+      我无法协助可能用于欺诈或社会工程攻击的请求。
+      
+      这是为了防止滥用和保护他人。
+
+# 风险级别定义
+severity_levels:
+  low:
+    score_range: [0.0, 0.3]
+    action: "allow"
+    log: false
+    
+  medium:
+    score_range: [0.3, 0.65]
+    action: "warn"
+    log: true
+    
+  high:
+    score_range: [0.65, 0.85]
+    action: "block"
+    log: true
+    require_appeal: true
+    
+  critical:
+    score_range: [0.85, 1.0]
+    action: "block"
+    log: true
+    require_appeal: true
+    alert_admin: true
+
+# 例外规则（白名单）
+exceptions:
+  # 教育/研究目的可以放宽某些检测
+  educational_context:
+    enabled: false  # 默认关闭
+    keywords:
+      - "for educational purposes"
+      - "learning about security"
+      - "research project"
+    # 即使有教育目的，某些内容仍然禁止
+    never_allow:
+      - "build a bomb"
+      - "create malware"
+      - "kill someone"

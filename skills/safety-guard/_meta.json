@@ -1,0 +1,30 @@
+{
+  "name": "safety-guard",
+  "version": "1.0.0",
+  "description": "OpenClaw Safety Guard - Analyze user input for harmful content and security threats",
+  "author": "John-niu-07",
+  "license": "MIT",
+  "homepage": "https://github.com/John-niu-07/openclaw-safety-guard",
+  "commands": [
+    {
+      "name": "safety-check",
+      "description": "Check message safety",
+      "usage": "safety-check <message>"
+    },
+    {
+      "name": "safety-config",
+      "description": "View or modify safety configuration",
+      "usage": "safety-config show|set|add"
+    },
+    {
+      "name": "safety-log",
+      "description": "View audit logs",
+      "usage": "safety-log [--limit N] [--filter TYPE] [--follow]"
+    }
+  ],
+  "dependencies": {
+    "bins": ["python3"],
+    "python_deps": ["PyYAML"]
+  },
+  "created_at": "2026-03-14T09:00:00Z"
+}

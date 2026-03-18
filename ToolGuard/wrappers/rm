@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+"""
+ToolGuard Wrapper for rm CLI
+
+监控文件删除操作，防止误删重要文件
+"""
+
+import subprocess
+import sys
+import json
+import http.client
+import os
+from pathlib import Path
+
+TOOLGUARD_HOST = '127.0.0.1'
+TOOLGUARD_PORT = 8767
+TIMEOUT = 5
+REAL_RM = '/bin/rm'
+
+def check_toolguard():
+    """检查 ToolGuard 是否允许执行"""
+    args = sys.argv[1:]
+    command = ' '.join(['rm'] + args)
+    
+    # 所有 rm 操作都需要确认
+    # 判断风险等级
+    has_recursive = '-r' in args or '-R' in args
+    has_force = '-f' in args
+    
+    if has_recursive and has_force:
+        risk_level = 'critical'
+        reason = 'rm -rf: 强制递归删除，极高风险'
+    elif has_recursive:
+        risk_level = 'critical'
+        reason = 'rm -r: 递归删除目录，高风险'
+    elif has_force:
+        risk_level = 'high'
+        reason = 'rm -f: 强制删除不提示，高风险'
+    else:
+        risk_level = 'high'
+        reason = 'rm: 删除文件操作'
+    
+    # 所有 rm 操作都触发 ToolGuard 检查
+    need_check = True
+    
+    try:
+        conn = http.client.HTTPConnection(TOOLGUARD_HOST, TOOLGUARD_PORT, timeout=TIMEOUT)
+        conn.request('POST', '/check', json.dumps({
+            'tool_name': 'rm',
+            'action': 'delete',
+            'parameters': {
+                'command': command,
+                'args': args,
+                'has_recursive': has_recursive,
+                'has_force': has_force
+            }
+        }), {'Content-Type': 'application/json'})
+        
+        response = conn.getresponse()
+        data = json.loads(response.read().decode())
+        conn.close()
+        
+        if data.get('need_confirmation'):
+            print(f"\n🛡️ ToolGuard 拦截：{command}")
+            print(f"   原因：{data.get('reason', reason)}")
+            print(f"   风险等级：{data.get('risk_level', risk_level)}")
+            print(f"   确认 ID: {data.get('confirmation_id')}")
+            print(f"\n请在 Web 界面确认：http://{TOOLGUARD_HOST}:{TOOLGUARD_PORT}")
+            
+            import time
+            start_time = time.time()
+            timeout = 300
+            
+            while time.time() - start_time < timeout:
+                try:
+                    conn = http.client.HTTPConnection(TOOLGUARD_HOST, TOOLGUARD_PORT, timeout=TIMEOUT)
+                    conf_id = data.get('confirmation_id')
+                    conn.request('GET', f'/api/confirmation/{conf_id}')
+                    response = conn.getresponse()
+                    status_data = json.loads(response.read().decode())
+                    conn.close()
+                    
+                    status = status_data.get('status')
+                    if status == 'approved':
+                        print("✅ 用户已允许，继续执行...\n")
+                        return True
+                    elif status == 'denied':
+                        print("❌ 用户已拒绝，终止执行")
+                        sys.exit(1)
+                    elif status == 'expired':
+                        print("⏰ 确认已超时，终止执行")
+                        sys.exit(1)
+                except Exception:
+                    pass
+                time.sleep(2)
+            
+            print("⏰ 等待确认超时，终止执行")
+            sys.exit(1)
+        
+        return True
+        
+    except Exception as e:
+        print(f"⚠️ ToolGuard 检查失败：{e}，继续执行...")
+        return True
+
+def main():
+    check_toolguard()
+    
+    rm_path = REAL_RM
+    if not Path(rm_path).exists():
+        result = subprocess.run(['which', 'rm'], capture_output=True, text=True)
+        if result.returncode == 0:
+            rm_path = result.stdout.strip()
+    
+    try:
+        result = subprocess.run([rm_path] + sys.argv[1:])
+        sys.exit(result.returncode)
+    except FileNotFoundError:
+        print(f"❌ 找不到 rm: {rm_path}")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n⚠️ 用户中断")
+        sys.exit(130)
+
+if __name__ == '__main__':
+    main()

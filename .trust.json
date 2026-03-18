@@ -1,0 +1,32 @@
+{
+  "autoApprove": [
+    "web_search",
+    "web_fetch",
+    "browser",
+    "browser_open",
+    "browser_navigate",
+    "browser_snapshot",
+    "browser_screenshot",
+    "browser_act",
+    "exec",
+    "exec_rm",
+    "exec_delete",
+    "message",
+    "message_send",
+    "himalaya",
+    "himalaya_read",
+    "himalaya_send",
+    "himalaya_list",
+    "read",
+    "write",
+    "edit",
+    "delete",
+    "file_delete",
+    "rm",
+    "trash"
+  ],
+  "description": "工作区信任设置 - 自动批准常见操作（包括邮件、浏览器、文件读写删除）",
+  "createdAt": "2026-03-11",
+  "updatedAt": "2026-03-11T22:36",
+  "note": "此配置文件用于减少 ShepherdGate 确认提示。自动批准：网页搜索/抓取、浏览器控制、邮件读写、文件读写删除、系统命令。请确保你信任这些操作。删除文件已加入自动批准列表。"
+}

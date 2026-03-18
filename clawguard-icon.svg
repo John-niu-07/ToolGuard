@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1b2a"/>
+      <stop offset="100%" style="stop-color:#1b263b"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00b4d8"/>
+      <stop offset="100%" style="stop-color:#0077b6"/>
+    </linearGradient>
+    <linearGradient id="crayfish" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b6b"/>
+      <stop offset="100%" style="stop-color:#ee5a5a"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5d4"/>
+      <stop offset="100%" style="stop-color:#00bbf9"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="innerGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="blur" in2="SourceAlpha" operator="arithmetic" k2="0.5" k3="0.5"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0.96  0 0 0 0 1  0 0 0 0.5 0"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg)" stroke="url(#accent)" stroke-width="4"/>
+  
+  <!-- Shield Shape (main element) -->
+  <g filter="url(#glow)">
+    <!-- Shield outline -->
+    <path d="M 256 100 L 380 140 L 380 240 Q 380 340 256 400 Q 132 340 132 240 L 132 140 Z" 
+          fill="url(#shield)" stroke="#00f5d4" stroke-width="4" opacity="0.9"/>
+    
+    <!-- Shield inner border -->
+    <path d="M 256 120 L 360 155 L 360 240 Q 360 320 256 375 Q 152 320 152 240 L 152 155 Z" 
+          fill="none" stroke="#00f5d4" stroke-width="2" opacity="0.5"/>
+  </g>
+  
+  <!-- Crayfish on Shield -->
+  <g filter="url(#glow)">
+    <!-- Body -->
+    <ellipse cx="256" cy="230" rx="55" ry="40" fill="url(#crayfish)"/>
+    <ellipse cx="256" cy="210" rx="45" ry="35" fill="url(#crayfish)"/>
+    
+    <!-- Head -->
+    <ellipse cx="256" cy="185" rx="40" ry="35" fill="url(#crayfish)"/>
+    
+    <!-- Eyes -->
+    <circle cx="238" cy="170" r="8" fill="#ffffff"/>
+    <circle cx="238" cy="170" r="4" fill="#000000"/>
+    <circle cx="274" cy="170" r="8" fill="#ffffff"/>
+    <circle cx="274" cy="170" r="4" fill="#000000"/>
+    
+    <!-- Antennae -->
+    <path d="M 225 165 Q 200 130 185 110" stroke="url(#crayfish)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M 287 165 Q 312 130 327 110" stroke="url(#crayfish)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    
+    <!-- Protective claws (guarding position) -->
+    <path d="M 215 220 Q 180 230 170 210 Q 165 200 180 195 Q 200 190 220 210" 
+          fill="url(#crayfish)" stroke="#cc4444" stroke-width="2"/>
+    <path d="M 297 220 Q 332 230 342 210 Q 347 200 332 195 Q 312 190 292 210" 
+          fill="url(#crayfish)" stroke="#cc4444" stroke-width="2"/>
+  </g>
+  
+  <!-- Security Check Mark -->
+  <path d="M 220 300 L 250 335 L 310 270" 
+        fill="none" stroke="url(#accent)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  
+  <!-- Lock icon at bottom -->
+  <g transform="translate(256, 360)">
+    <rect x="-25" y="0" width="50" height="35" rx="5" fill="url(#shield)" stroke="#00f5d4" stroke-width="2"/>
+    <path d="M -15 0 L -15 -15 Q -15 -25 0 -25 Q 15 -25 15 -15 L 15 0" 
+          fill="none" stroke="#00f5d4" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="0" cy="18" r="5" fill="#00f5d4"/>
+  </g>
+  
+  <!-- Corner accents (security corners) -->
+  <circle cx="180" cy="180" r="8" fill="url(#accent)"/>
+  <circle cx="332" cy="180" r="8" fill="url(#accent)"/>
+  <circle cx="180" cy="332" r="8" fill="url(#accent)"/>
+  <circle cx="332" cy="332" r="8" fill="url(#accent)"/>
+  
+  <!-- Text -->
+  <text x="256" y="470" font-family="Arial, sans-serif" font-size="26" font-weight="bold" 
+        fill="#00f5d4" text-anchor="middle" letter-spacing="3">CLAWGUARD</text>
+  
+  <!-- Tagline -->
+  <text x="256" y="495" font-family="Arial, sans-serif" font-size="14" 
+        fill="#00b4d8" text-anchor="middle" letter-spacing="1">AI SAFETY SHIELD</text>
+</svg>

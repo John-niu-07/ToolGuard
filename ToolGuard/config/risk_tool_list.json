@@ -1,0 +1,335 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-18",
+  "description": "ToolGuard Risk Tool List - 危险工具调用列表",
+  "risk_tools": [
+    {
+      "tool_name": "message",
+      "action": "send",
+      "risk_level": "high",
+      "reason": "可能发送未授权消息",
+      "require_confirmation": true,
+      "examples": [
+        "发送邮件",
+        "发送消息",
+        "发送通知"
+      ]
+    },
+    {
+      "tool_name": "exec",
+      "action": "*",
+      "risk_level": "critical",
+      "reason": "执行系统命令，可能危害系统安全",
+      "require_confirmation": true,
+      "examples": [
+        "执行 shell 命令",
+        "运行脚本"
+      ]
+    },
+    {
+      "tool_name": "browser",
+      "action": "*",
+      "risk_level": "medium",
+      "reason": "浏览器自动化可能访问敏感信息",
+      "require_confirmation": true,
+      "examples": [
+        "打开网页",
+        "浏览器自动化",
+        "截图"
+      ]
+    },
+    {
+      "tool_name": "feishu_doc",
+      "action": "write",
+      "risk_level": "high",
+      "reason": "写入飞书文档可能泄露信息",
+      "require_confirmation": true,
+      "examples": [
+        "写入文档",
+        "创建文档"
+      ]
+    },
+    {
+      "tool_name": "feishu_doc",
+      "action": "delete",
+      "risk_level": "critical",
+      "reason": "删除飞书文档",
+      "require_confirmation": true,
+      "examples": [
+        "删除文档"
+      ]
+    },
+    {
+      "tool_name": "feishu_drive",
+      "action": "*",
+      "risk_level": "high",
+      "reason": "文件操作可能泄露或删除数据",
+      "require_confirmation": true,
+      "examples": [
+        "上传文件",
+        "删除文件",
+        "移动文件"
+      ]
+    },
+    {
+      "tool_name": "feishu_bitable",
+      "action": "create_record",
+      "risk_level": "medium",
+      "reason": "创建多维表格记录",
+      "require_confirmation": true,
+      "examples": [
+        "添加记录"
+      ]
+    },
+    {
+      "tool_name": "feishu_bitable",
+      "action": "delete_record",
+      "risk_level": "high",
+      "reason": "删除多维表格记录",
+      "require_confirmation": true,
+      "examples": [
+        "删除记录"
+      ]
+    },
+    {
+      "tool_name": "nodes",
+      "action": "run",
+      "risk_level": "critical",
+      "reason": "在配对的节点设备上运行命令",
+      "require_confirmation": true,
+      "examples": [
+        "远程执行",
+        "设备控制"
+      ]
+    },
+    {
+      "tool_name": "gateway",
+      "action": "restart",
+      "risk_level": "critical",
+      "reason": "重启 Gateway 可能中断服务",
+      "require_confirmation": true,
+      "examples": [
+        "重启服务"
+      ]
+    },
+    {
+      "tool_name": "gateway",
+      "action": "config.apply",
+      "risk_level": "critical",
+      "reason": "应用配置可能改变系统行为",
+      "require_confirmation": true,
+      "examples": [
+        "应用配置"
+      ]
+    },
+    {
+      "tool_name": "cron",
+      "action": "add",
+      "risk_level": "high",
+      "reason": "添加定时任务可能自动执行危险操作",
+      "require_confirmation": true,
+      "examples": [
+        "添加定时任务",
+        "创建 cron 作业"
+      ]
+    },
+    {
+      "tool_name": "himalaya",
+      "action": "*",
+      "risk_level": "high",
+      "reason": "发送邮件，可能发送未授权内容",
+      "require_confirmation": true,
+      "examples": [
+        "发送邮件",
+        "回复邮件",
+        "转发邮件"
+      ]
+    },
+    {
+      "tool_name": "gog",
+      "action": "gmail_send",
+      "risk_level": "high",
+      "reason": "通过 Gmail 发送邮件，可能发送未授权内容",
+      "require_confirmation": true,
+      "examples": [
+        "发送邮件",
+        "自动回复"
+      ]
+    },
+    {
+      "tool_name": "git",
+      "action": "push",
+      "risk_level": "critical",
+      "reason": "推送代码到远程仓库，可能泄露敏感信息",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "git",
+      "action": "commit",
+      "risk_level": "high",
+      "reason": "提交代码可能包含敏感信息",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "ssh",
+      "action": "connect",
+      "risk_level": "high",
+      "reason": "SSH 远程连接",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "scp",
+      "action": "transfer",
+      "risk_level": "high",
+      "reason": "文件传输可能泄露数据",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "rsync",
+      "action": "sync",
+      "risk_level": "high",
+      "reason": "文件同步可能泄露数据",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "curl",
+      "action": "request",
+      "risk_level": "medium",
+      "reason": "网络请求可能泄露数据",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "mail-send",
+      "action": "send",
+      "risk_level": "high",
+      "reason": "发送邮件，可能发送未授权内容",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "exec",
+      "action": "rm",
+      "risk_level": "critical",
+      "reason": "删除文件操作，可能导致数据丢失",
+      "require_confirmation": true,
+      "examples": [
+        "rm file.txt",
+        "rm -rf directory"
+      ]
+    },
+    {
+      "tool_name": "exec",
+      "action": "trash",
+      "risk_level": "high",
+      "reason": "删除文件到回收站，可能误删重要文件",
+      "require_confirmation": true,
+      "examples": [
+        "trash file.txt"
+      ]
+    },
+    {
+      "tool_name": "feishu_drive",
+      "action": "delete",
+      "risk_level": "critical",
+      "reason": "删除飞书云文档，可能导致数据丢失",
+      "require_confirmation": true,
+      "examples": [
+        "删除飞书文件"
+      ]
+    },
+    {
+      "tool_name": "rm",
+      "action": "delete",
+      "risk_level": "high",
+      "reason": "rm: 删除文件操作",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "trash",
+      "action": "delete",
+      "risk_level": "high",
+      "reason": "trash: 删除文件到回收站",
+      "require_confirmation": true,
+      "examples": []
+    }
+  ],
+  "safe_tools": [
+    {
+      "tool_name": "read",
+      "reason": "读取文件（只读操作）"
+    },
+    {
+      "tool_name": "web_search",
+      "reason": "网络搜索（只读操作）"
+    },
+    {
+      "tool_name": "web_fetch",
+      "reason": "获取网页内容（只读操作）"
+    },
+    {
+      "tool_name": "memory_search",
+      "reason": "搜索记忆（只读操作）"
+    },
+    {
+      "tool_name": "memory_get",
+      "reason": "获取记忆片段（只读操作）"
+    },
+    {
+      "tool_name": "browser",
+      "action": "snapshot",
+      "reason": "浏览器快照（只读操作）"
+    },
+    {
+      "tool_name": "feishu_doc",
+      "action": "read",
+      "reason": "读取飞书文档（只读操作）"
+    },
+    {
+      "tool_name": "feishu_drive",
+      "action": "list",
+      "reason": "列出文件（只读操作）"
+    },
+    {
+      "tool_name": "feishu_bitable",
+      "action": "list_records",
+      "reason": "列出记录（只读操作）"
+    },
+    {
+      "tool_name": "feishu_bitable",
+      "action": "get_record",
+      "reason": "获取记录（只读操作）"
+    }
+  ],
+  "risk_levels": {
+    "low": {
+      "color": "🟢",
+      "auto_approve": true,
+      "description": "低风险，自动放行"
+    },
+    "medium": {
+      "color": "🟡",
+      "auto_approve": false,
+      "timeout": 300,
+      "description": "中风险，需要确认"
+    },
+    "high": {
+      "color": "🟠",
+      "auto_approve": false,
+      "timeout": 300,
+      "description": "高风险，需要确认"
+    },
+    "critical": {
+      "color": "🔴",
+      "auto_approve": false,
+      "timeout": 600,
+      "description": "严重风险，需要确认且超时时间更长"
+    }
+  }
+}
