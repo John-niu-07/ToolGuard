@@ -1,0 +1,14 @@
+{
+  "task_mode": true,
+  "current_task": "发送天气预报邮件到 zhenxingniu06@gmail.com",
+  "allowed_tools": [
+    "himalaya",
+    "gog",
+    "web_fetch",
+    "mail-send",
+    "exec",
+    "web_search",
+    "message"
+  ],
+  "timestamp": "2026-03-18T22:02:24.418294"
+}

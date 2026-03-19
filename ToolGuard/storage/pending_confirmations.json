@@ -227,5 +227,40 @@
     "status": "approved",
     "response_time": "2026-03-18T09:15:06.020368",
     "user_id": "unknown"
+  },
+  "5aba29b5-40c1-40c2-8484-405f0ea42642": {
+    "confirmation_id": "5aba29b5-40c1-40c2-8484-405f0ea42642",
+    "tool_name": "git",
+    "action": "push",
+    "parameters": {},
+    "reason": "推送代码到远程仓库，可能泄露敏感信息",
+    "risk_level": "critical",
+    "timestamp": "2026-03-18T21:44:35.968185",
+    "expires_at": "2026-03-18T21:54:35.968188",
+    "status": "denied",
+    "response_time": "2026-03-18T21:49:34.991486",
+    "user_id": "unknown",
+    "task_mode": false,
+    "current_task": null
+  },
+  "4d82fdaa-6615-47f7-9889-a7d95d31c774": {
+    "confirmation_id": "4d82fdaa-6615-47f7-9889-a7d95d31c774",
+    "tool_name": "rm",
+    "action": "delete",
+    "parameters": {
+      "command": "rm /Users/mike/.openclaw/workspace/niu2.txt",
+      "args": "['/Users/mike/.openclaw/workspace/niu2.txt']",
+      "has_recursive": "False",
+      "has_force": "False"
+    },
+    "reason": "工具 rm 不在当前任务的备选工具集中",
+    "risk_level": "high",
+    "timestamp": "2026-03-18T21:54:14.318865",
+    "expires_at": "2026-03-18T21:59:14.318867",
+    "status": "approved",
+    "response_time": "2026-03-18T21:54:56.046855",
+    "user_id": "unknown",
+    "task_mode": true,
+    "current_task": "查阅一下我最新的一封未读邮件，查看邮件内容"
   }
 }
