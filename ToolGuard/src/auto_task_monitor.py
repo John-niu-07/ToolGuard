@@ -58,17 +58,20 @@ def is_task_instruction(message: str) -> bool:
     返回：
         是否是任务指令
     """
-    message_lower = message.lower()
+    # 太短的消息不是任务
+    if len(message.strip()) < 4:
+        return False
     
     # 检查是否包含任务关键词
     for pattern in TASK_PATTERNS:
-        if re.search(pattern, message_lower):
+        if re.search(pattern, message):
             return True
     
     # 检查是否包含动词（简单判断）
     task_verbs = ['发送', '查询', '查看', '删除', '创建', '写入', '推送', '提交', 
                   '拉取', '下载', '上传', '同步', '搜索', '查找', '阅读', '查阅',
-                  '回复', '转发', '打开', '访问', '截图', '连接', '复制', '配置', '设置']
+                  '回复', '转发', '打开', '访问', '截图', '连接', '复制', '配置', '设置',
+                  '执行', '运行', '测试', '安装', '卸载', '备份', '恢复']
     
     for verb in task_verbs:
         if verb in message:

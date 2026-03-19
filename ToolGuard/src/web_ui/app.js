@@ -510,20 +510,31 @@ async function loadTaskStatus() {
         if (status.task_mode && status.current_task) {
             // 显示任务监控状态
             taskMonitorStatus.style.display = 'block';
-            taskMonitorInfo.style.display = 'block';
+            if (taskMonitorInfo) taskMonitorInfo.style.display = 'block';
             
             document.getElementById('currentTaskText').textContent = status.current_task;
-            document.getElementById('taskInfoText').textContent = status.current_task;
+            if (document.getElementById('taskInfoText')) {
+                document.getElementById('taskInfoText').textContent = status.current_task;
+            }
             
             const allowedTools = status.allowed_tools || [];
             document.getElementById('allowedToolsText').textContent = 
                 `备选工具：${allowedTools.join(', ')}`;
-            document.getElementById('allowedToolsInfo').textContent = 
-                allowedTools.join(', ');
+            if (document.getElementById('allowedToolsInfo')) {
+                document.getElementById('allowedToolsInfo').textContent = 
+                    allowedTools.join(', ');
+            }
+            
+            // 显示自动启动提示
+            if (!window.taskNotified) {
+                showNotification('📋 检测到任务指令，已自动启动任务监控', 'success');
+                window.taskNotified = true;
+            }
         } else {
             // 隐藏任务监控状态
             taskMonitorStatus.style.display = 'none';
-            taskMonitorInfo.style.display = 'none';
+            if (taskMonitorInfo) taskMonitorInfo.style.display = 'none';
+            window.taskNotified = false;
         }
     } catch (error) {
         console.error('加载任务状态失败:', error);
