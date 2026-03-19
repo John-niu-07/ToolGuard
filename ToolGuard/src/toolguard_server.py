@@ -130,6 +130,10 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
         elif self.path == '/api/risk-tools':
             self.send_json(guard.risk_tools)
         
+        # 获取任务状态
+        elif self.path == '/api/task/status':
+            self.send_json(guard.get_task_state())
+        
         else:
             self.send_json({"error": "Not found"}, 404)
     
@@ -312,6 +316,39 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
                 self.send_json({"success": True, "message": "Configuration saved"})
             else:
                 self.send_json({"success": False, "error": "Save failed"}, 400)
+        
+        # 启动任务监控
+        elif self.path == '/api/task/start':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            
+            try:
+                data = json.loads(body) if body else {}
+            except json.JSONDecodeError:
+                self.send_json({"error": "Invalid JSON"}, 400)
+                return
+            
+            task = data.get('task', '')
+            if not task:
+                self.send_json({"error": "task required"}, 400)
+                return
+            
+            allowed_tools = guard.start_task_monitoring(task)
+            
+            self.send_json({
+                "success": True,
+                "message": "Task monitoring started",
+                "task": task,
+                "allowed_tools": list(allowed_tools)
+            })
+        
+        # 停止任务监控
+        elif self.path == '/api/task/stop':
+            guard.stop_task_monitoring()
+            self.send_json({
+                "success": True,
+                "message": "Task monitoring stopped"
+            })
         
         else:
             self.send_json({"error": "Not found"}, 404)

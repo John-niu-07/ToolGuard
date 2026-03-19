@@ -351,7 +351,7 @@
     <div class="container">
         <!-- 头部 -->
         <div class="header">
-            <h1>🛡️ ToolGuard 工具调用监控</h1>
+            <h1>🛡️ ToolGuard 工具调用监控 <span style="font-size: 14px; color: #667eea;">v3.0.0</span></h1>
             <div class="status-bar">
                 <span class="status-indicator status-ok" id="statusIndicator">
                     <span>🟢</span>
@@ -360,12 +360,24 @@
                 <span id="serviceInfo">端口：8767</span>
                 <button class="refresh-btn" onclick="refreshAll()">🔄 刷新</button>
             </div>
+            <!-- 任务监控状态 -->
+            <div id="taskMonitorStatus" style="margin-top: 16px; padding: 12px; background: #f0f4ff; border-radius: 8px; display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>📋 任务监控中</strong>
+                        <p id="currentTaskText" style="margin: 4px 0 0; color: #666; font-size: 14px;"></p>
+                        <p id="allowedToolsText" style="margin: 4px 0 0; color: #666; font-size: 13px;"></p>
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="stopTaskMonitoring()">⏹️ 停止监控</button>
+                </div>
+            </div>
         </div>
         
         <!-- 选项卡 -->
         <div class="card">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('pending')">⏳ 待确认请求</button>
+                <button class="tab" onclick="switchTab('task-monitor')">📋 任务监控</button>
                 <button class="tab" onclick="switchTab('risk-tools')">🛡️ Risk Tools 管理</button>
                 <button class="tab" onclick="switchTab('audit')">📋 审计日志</button>
             </div>
@@ -374,6 +386,29 @@
             <div id="tab-pending" class="tab-content active">
                 <div id="pendingList">
                     <div class="empty-state">加载中...</div>
+                </div>
+            </div>
+            
+            <!-- 任务监控 -->
+            <div id="tab-task-monitor" class="tab-content">
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #333; margin-bottom: 12px;">📋 启动任务监控</h3>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="taskInput" placeholder="输入任务描述，如：发送天气预报邮件到 zhenxingniu06@gmail.com" 
+                               style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <button class="btn btn-primary" onclick="startTaskMonitoring()">🚀 启动监控</button>
+                    </div>
+                </div>
+                
+                <div id="taskMonitorInfo" style="display: none;">
+                    <h4 style="color: #333; margin-bottom: 12px;">当前任务状态</h4>
+                    <div style="background: #f0f4ff; padding: 16px; border-radius: 8px;">
+                        <p><strong>任务：</strong><span id="taskInfoText"></span></p>
+                        <p><strong>备选工具集：</strong><span id="allowedToolsInfo"></span></p>
+                        <p style="margin-top: 12px;">
+                            <button class="btn btn-danger btn-small" onclick="stopTaskMonitoring()">⏹️ 停止监控</button>
+                        </p>
+                    </div>
                 </div>
             </div>
             

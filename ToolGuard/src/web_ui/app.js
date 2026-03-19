@@ -8,16 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPendingConfirmations();
     loadRiskTools();
     loadAuditLog();
+    loadTaskStatus();
     
-    // 每 10 秒自动刷新待确认
+    // 每 10 秒自动刷新待确认和任务状态
     setInterval(() => {
         loadPendingConfirmations();
+        loadTaskStatus();
     }, 10000);
 });
 
 // 切换选项卡
 function switchTab(tabName) {
-    // 更新选项卡样式
     document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
     });
@@ -25,15 +26,15 @@ function switchTab(tabName) {
         content.classList.remove('active');
     });
     
-    // 激活当前选项卡
     event.target.classList.add('active');
     document.getElementById(`tab-${tabName}`).classList.add('active');
     
-    // 加载对应数据
     if (tabName === 'risk-tools') {
         loadRiskTools();
     } else if (tabName === 'audit') {
         loadAuditLog();
+    } else if (tabName === 'task-monitor') {
+        loadTaskStatus();
     }
 }
 
@@ -435,8 +436,98 @@ function closeModal() {
 function refreshAll() {
     checkServiceStatus();
     loadPendingConfirmations();
+    loadTaskStatus();
     loadAuditLog();
     showNotification('🔄 已刷新', 'success');
+}
+
+// ============================================================================
+// 任务监控功能
+// ============================================================================
+
+// 启动任务监控
+async function startTaskMonitoring() {
+    const taskInput = document.getElementById('taskInput');
+    const task = taskInput.value.trim();
+    
+    if (!task) {
+        showNotification('❌ 请输入任务描述', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/task/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task: task })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ 任务监控已启动', 'success');
+            taskInput.value = '';
+            loadTaskStatus();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('启动任务监控失败:', error);
+        showNotification('❌ 启动失败：' + error.message, 'error');
+    }
+}
+
+// 停止任务监控
+async function stopTaskMonitoring() {
+    try {
+        const response = await fetch(`${API_BASE}/api/task/stop`, {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('⏹️ 任务监控已停止', 'success');
+            loadTaskStatus();
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('停止任务监控失败:', error);
+        showNotification('❌ 停止失败：' + error.message, 'error');
+    }
+}
+
+// 加载任务状态
+async function loadTaskStatus() {
+    try {
+        const response = await fetch(`${API_BASE}/api/task/status`);
+        const status = await response.json();
+        
+        const taskMonitorStatus = document.getElementById('taskMonitorStatus');
+        const taskMonitorInfo = document.getElementById('taskMonitorInfo');
+        
+        if (status.task_mode && status.current_task) {
+            // 显示任务监控状态
+            taskMonitorStatus.style.display = 'block';
+            taskMonitorInfo.style.display = 'block';
+            
+            document.getElementById('currentTaskText').textContent = status.current_task;
+            document.getElementById('taskInfoText').textContent = status.current_task;
+            
+            const allowedTools = status.allowed_tools || [];
+            document.getElementById('allowedToolsText').textContent = 
+                `备选工具：${allowedTools.join(', ')}`;
+            document.getElementById('allowedToolsInfo').textContent = 
+                allowedTools.join(', ');
+        } else {
+            // 隐藏任务监控状态
+            taskMonitorStatus.style.display = 'none';
+            taskMonitorInfo.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('加载任务状态失败:', error);
+    }
 }
 
 // 获取风险等级文本

@@ -1,0 +1,161 @@
+# ToolGuard 任务 - 工具映射配置
+# 用于任务级工具集监控
+
+# 格式：关键词：[工具列表]
+
+# 邮件相关
+email:
+  - message
+  - himalaya
+  - gog
+  - mail-send
+
+邮件：
+  - message
+  - himalaya
+  - gog
+  - mail-send
+
+# 文件操作
+file:
+  - read
+  - write
+  - exec
+
+文件：
+  - read
+  - write
+  - exec
+
+delete:
+  - read
+  - write
+  - exec
+  - rm
+  - trash
+
+删除：
+  - read
+  - write
+  - exec
+  - rm
+  - trash
+
+# 天气查询
+weather:
+  - web_search
+  - web_fetch
+  - exec
+
+天气：
+  - web_search
+  - web_fetch
+  - exec
+
+# 代码管理
+git:
+  - git
+  - exec
+  - read
+  - write
+
+push:
+  - git
+  - exec
+
+commit:
+  - git
+  - exec
+
+# 网络请求
+curl:
+  - curl
+  - exec
+
+http:
+  - curl
+  - web_fetch
+  - exec
+
+api:
+  - curl
+  - web_fetch
+  - exec
+
+# 远程连接
+ssh:
+  - ssh
+  - exec
+
+remote:
+  - ssh
+  - scp
+  - rsync
+  - exec
+
+scp:
+  - scp
+  - exec
+
+rsync:
+  - rsync
+  - exec
+
+# 浏览器
+browser:
+  - browser
+
+网页：
+  - browser
+  - web_fetch
+
+screenshot:
+  - browser
+
+# 飞书办公
+feishu:
+  - feishu_doc
+  - feishu_drive
+  - feishu_bitable
+  - feishu_chat
+
+飞书：
+  - feishu_doc
+  - feishu_drive
+  - feishu_bitable
+  - feishu_chat
+
+# 系统管理
+system:
+  - exec
+  - gateway
+  - cron
+  - nodes
+
+配置：
+  - gateway
+  - read
+  - write
+
+定时：
+  - cron
+  - exec
+
+# 通用任务
+search:
+  - web_search
+  - memory_search
+
+搜索：
+  - web_search
+  - memory_search
+
+read:
+  - read
+  - web_fetch
+  - memory_get
+
+写：
+  - write
+  - message
+  - mail-send
