@@ -1,0 +1,12 @@
+{
+  "task_mode": false,
+  "current_task": "测试一下",
+  "allowed_tools": [
+    "memory_search",
+    "web_search",
+    "read",
+    "memory_get",
+    "web_fetch"
+  ],
+  "timestamp": "2026-03-23T01:35:47.954106"
+}

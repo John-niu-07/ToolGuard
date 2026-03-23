@@ -95,6 +95,20 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
                 "version": "1.0.0",
             })
         
+        # 获取工具集信息
+        elif self.path == '/api/tool-sets':
+            tool_sets = guard.get_tool_sets()
+            self.send_json(tool_sets)
+        
+        # 获取任务状态
+        elif self.path == '/api/task/status':
+            status = {
+                'task_mode': guard.task_mode,
+                'current_task': guard.current_task,
+                'allowed_tools': list(guard.allowed_tools)
+            }
+            self.send_json(status)
+        
         # 获取待处理确认
         elif self.path == '/api/pending':
             pending = guard.get_pending_confirmations()
@@ -130,6 +144,10 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
         elif self.path == '/api/risk-tools':
             self.send_json(guard.risk_tools)
         
+        # 获取任务状态
+        elif self.path == '/api/task/status':
+            self.send_json(guard.get_task_state())
+        
         else:
             self.send_json({"error": "Not found"}, 404)
     
@@ -157,14 +175,18 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
             # 检查是否需要确认
             need_confirmation, reason, risk_level = guard.check_tool_call(tool_name, action, parameters)
             
+            guard._log(f"检查结果：need_confirmation={need_confirmation}, reason={reason}")
+            
             if need_confirmation:
                 # 请求确认
                 confirmation_id = guard.request_confirmation(tool_name, action, parameters, reason, risk_level)
                 
+                guard._log(f"已创建待确认请求：{confirmation_id}")
+                
                 self.send_json({
                     "need_confirmation": True,
                     "confirmation_id": confirmation_id,
-                    "message": f"⚠️ 危险工具调用：{tool_name}.{action}\n原因：{reason}\n风险等级：{risk_level}\n请确认是否允许。",
+                    "message": f"⚠️ 工具 {tool_name}.{action} 需要确认\n\n原因：{reason}\n\n请在 Web UI 的「待确认请求」页面查看并确认，确认后请重新执行命令。\n\nWeb UI 地址：http://127.0.0.1:8767",
                     "tool_name": tool_name,
                     "action": action,
                     "risk_level": risk_level,
@@ -192,7 +214,7 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
                 self.send_json({"error": "confirmation_id required"}, 400)
                 return
             
-            success = guard.set_confirmation_response(confirmation_id, approved)
+            success = guard.respond_confirmation(confirmation_id, approved)
             
             if success:
                 self.send_json({
@@ -204,6 +226,72 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
                     "success": False,
                     "error": "Confirmation not found or already processed",
                 }, 400)
+        
+        # 更新当前任务
+        elif self.path == '/api/task/update':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            
+            try:
+                data = json.loads(body) if body else {}
+            except json.JSONDecodeError:
+                self.send_json({"error": "Invalid JSON"}, 400)
+                return
+            
+            task = data.get('task', '')
+            channel = data.get('channel', 'unknown')
+            
+            if guard:
+                guard.update_current_task(task, channel)
+            
+            self.send_json({
+                "success": True,
+                "message": f"Task updated: {task}",
+            })
+        
+        # 移动工具到禁止集
+        elif self.path == '/api/tools/block':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            
+            try:
+                data = json.loads(body) if body else {}
+            except json.JSONDecodeError:
+                self.send_json({"error": "Invalid JSON"}, 400)
+                return
+            
+            tool_name = data.get('tool_name')
+            if not tool_name:
+                self.send_json({"error": "tool_name required"}, 400)
+                return
+            
+            success = guard.move_tool_to_blocked(tool_name)
+            if success:
+                self.send_json({"success": True, "message": f"{tool_name} 已移至禁止工具集"})
+            else:
+                self.send_json({"error": f"{tool_name} 不在备选工具集中"}, 400)
+        
+        # 移动工具到备选集
+        elif self.path == '/api/tools/allow':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            
+            try:
+                data = json.loads(body) if body else {}
+            except json.JSONDecodeError:
+                self.send_json({"error": "Invalid JSON"}, 400)
+                return
+            
+            tool_name = data.get('tool_name')
+            if not tool_name:
+                self.send_json({"error": "tool_name required"}, 400)
+                return
+            
+            success = guard.move_tool_to_allowed(tool_name)
+            if success:
+                self.send_json({"success": True, "message": f"{tool_name} 已移至备选工具集"})
+            else:
+                self.send_json({"error": f"{tool_name} 不在禁止工具集中"}, 400)
         
         # 重新加载 risk tool 列表
         elif self.path == '/api/reload':
@@ -312,6 +400,39 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
                 self.send_json({"success": True, "message": "Configuration saved"})
             else:
                 self.send_json({"success": False, "error": "Save failed"}, 400)
+        
+        # 启动任务监控
+        elif self.path == '/api/task/start':
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            
+            try:
+                data = json.loads(body) if body else {}
+            except json.JSONDecodeError:
+                self.send_json({"error": "Invalid JSON"}, 400)
+                return
+            
+            task = data.get('task', '')
+            if not task:
+                self.send_json({"error": "task required"}, 400)
+                return
+            
+            allowed_tools = guard.start_task_monitoring(task)
+            
+            self.send_json({
+                "success": True,
+                "message": "Task monitoring started",
+                "task": task,
+                "allowed_tools": list(allowed_tools)
+            })
+        
+        # 停止任务监控
+        elif self.path == '/api/task/stop':
+            guard.stop_task_monitoring()
+            self.send_json({
+                "success": True,
+                "message": "Task monitoring stopped"
+            })
         
         else:
             self.send_json({"error": "Not found"}, 404)
