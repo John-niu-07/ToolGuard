@@ -3,13 +3,14 @@
 ToolGuard 任务分析器
 
 根据用户任务/指令确定备选工具集
+从 Risk Tools 管理中的"安全工具"列表选取备选工具
 """
 
-import yaml
+import json
 from pathlib import Path
 from typing import Dict, List, Set
 
-# 预定义的任务 - 工具映射
+# 预定义的任务 - 工具映射（用于识别任务类型）
 DEFAULT_TASK_TOOL_MAPPING = {
     # 邮件相关任务
     'email': ['message', 'himalaya', 'gog', 'mail-send'],
@@ -72,8 +73,11 @@ class TaskAnalyzer:
         self.config_path = config_path or str(
             Path.home() / ".openclaw/workspace/ToolGuard/config/task_tool_mapping.yaml"
         )
+        self.risk_tool_list_path = str(
+            Path.home() / ".openclaw/workspace/ToolGuard/config/risk_tool_list.json"
+        )
         self.task_tool_mapping = self._load_mapping()
-        self.all_tools = self._get_all_tools()
+        self.safe_tools = self._load_safe_tools()
         self.current_task = None
         self.allowed_tools: Set[str] = set()
     
@@ -83,7 +87,7 @@ class TaskAnalyzer:
             config_file = Path(self.config_path).expanduser()
             if config_file.exists():
                 with open(config_file, 'r', encoding='utf-8') as f:
-                    custom_mapping = yaml.safe_load(f) or {}
+                    custom_mapping = json.load(f) or {}
                 # 合并自定义和默认映射
                 merged = DEFAULT_TASK_TOOL_MAPPING.copy()
                 merged.update(custom_mapping)
@@ -94,36 +98,42 @@ class TaskAnalyzer:
             print(f"加载任务 - 工具映射失败：{e}")
             return DEFAULT_TASK_TOOL_MAPPING
     
-    def _get_all_tools(self) -> Set[str]:
-        """获取所有可用工具"""
-        all_tools = set()
-        for tools in DEFAULT_TASK_TOOL_MAPPING.values():
-            all_tools.update(tools)
-        # 添加 OpenClaw 内置工具
-        all_tools.update([
-            'read', 'write', 'edit', 'exec', 'process',
-            'web_search', 'web_fetch', 'browser', 'canvas',
-            'nodes', 'cron', 'message', 'tts', 'gateway',
-            'memory_search', 'memory_get', 'sessions_list',
-            'sessions_history', 'sessions_send', 'sessions_spawn',
-            'subagents', 'session_status', 'agents_list',
-            'feishu_doc', 'feishu_drive', 'feishu_wiki',
-            'feishu_bitable', 'feishu_chat', 'feishu_app_scopes',
-            'himalaya', 'gog', 'git', 'curl', 'ssh', 'scp',
-            'rsync', 'trash', 'rm', 'mail-send'
-        ])
-        return all_tools
+    def _load_safe_tools(self) -> Set[str]:
+        """从 risk_tool_list.json 加载安全工具列表"""
+        try:
+            risk_tool_file = Path(self.risk_tool_list_path).expanduser()
+            if risk_tool_file.exists():
+                with open(risk_tool_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                safe_tools = set()
+                for tool in data.get('safe_tools', []):
+                    tool_name = tool.get('tool_name', '')
+                    if tool_name:
+                        safe_tools.add(tool_name)
+                
+                print(f"✅ 加载安全工具列表：{len(safe_tools)} 个工具")
+                return safe_tools
+            else:
+                print(f"⚠️  Risk tool list 不存在，使用默认安全工具")
+                return {'read', 'web_search', 'web_fetch', 'memory_search', 'memory_get'}
+        except Exception as e:
+            print(f"加载安全工具列表失败：{e}")
+            return {'read', 'web_search', 'web_fetch', 'memory_search', 'memory_get'}
     
     def analyze_task(self, task: str) -> Set[str]:
         """
-        分析任务，确定备选工具集
+        分析任务，从安全工具列表中确定备选工具集
         
         参数：
             task: 用户任务/指令
             
         返回：
-            备选工具集
+            备选工具集（仅包含安全工具列表中的工具）
         """
+        # 每次分析任务时都重新加载安全工具列表（确保使用最新配置）
+        self.safe_tools = self._load_safe_tools()
+        
         self.current_task = task
         task_lower = task.lower()
         
@@ -133,12 +143,24 @@ class TaskAnalyzer:
             if keyword.lower() in task_lower:
                 matched_tools.update(tools)
         
-        # 2. 如果没有匹配到，使用默认工具集
-        if not matched_tools:
-            matched_tools = {'read', 'write', 'web_search', 'web_fetch', 'message'}
+        # 2. 从安全工具列表中过滤
+        allowed_tools = matched_tools.intersection(self.safe_tools)
         
-        self.allowed_tools = matched_tools
-        return matched_tools
+        # 3. 如果没有匹配到，使用安全工具列表中的默认工具集
+        if not allowed_tools:
+            # 从安全工具列表中选择通用的只读工具
+            allowed_tools = self.safe_tools.intersection({
+                'read', 'web_search', 'web_fetch', 
+                'memory_search', 'memory_get', 'browser'
+            })
+            # 如果还是没有，就使用所有安全工具
+            if not allowed_tools:
+                allowed_tools = self.safe_tools.copy()
+        
+        self.allowed_tools = allowed_tools
+        print(f"📋 任务：{task}")
+        print(f"✅ 备选工具集：{', '.join(sorted(allowed_tools))}")
+        return allowed_tools
     
     def is_tool_allowed(self, tool_name: str) -> bool:
         """
@@ -150,6 +172,12 @@ class TaskAnalyzer:
         返回：
             是否允许
         """
+        # 首先检查是否在安全工具列表中
+        if tool_name not in self.safe_tools:
+            print(f"❌ 工具 {tool_name} 不在安全工具列表中")
+            return False
+        
+        # 然后检查是否在当前任务的备选工具集中
         return tool_name in self.allowed_tools
     
     def get_allowed_tools(self) -> Set[str]:
@@ -158,23 +186,21 @@ class TaskAnalyzer:
     
     def add_allowed_tool(self, tool_name: str):
         """添加工具到备选集"""
-        self.allowed_tools.add(tool_name)
+        if tool_name in self.safe_tools:
+            self.allowed_tools.add(tool_name)
+            print(f"✅ 添加工具 {tool_name} 到备选集")
+        else:
+            print(f"❌ 工具 {tool_name} 不在安全工具列表中，无法添加")
     
     def reset(self):
         """重置分析器"""
         self.current_task = None
         self.allowed_tools = set()
     
-    def save_mapping(self):
-        """保存自定义映射"""
-        try:
-            config_file = Path(self.config_path).expanduser()
-            config_file.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(config_file, 'w', encoding='utf-8') as f:
-                yaml.dump({}, f, allow_unicode=True, default_flow_style=False)
-        except Exception as e:
-            print(f"保存映射失败：{e}")
+    def reload_safe_tools(self):
+        """重新加载安全工具列表"""
+        self.safe_tools = self._load_safe_tools()
+        print(f"✅ 安全工具列表已重新加载：{len(self.safe_tools)} 个工具")
 
 
 # 全局实例

@@ -3,81 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛡️ ToolGuard 工具调用监控</title>
+    <title>🛡️ ToolGuard - 工具调用监控</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header h1 {
             color: #333;
-            font-size: 28px;
-            margin-bottom: 8px;
         }
-        
-        .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 16px;
-        }
-        
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .status-ok {
-            background: #10b981;
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
             color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-        
         .card {
             background: white;
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        
         .card h2 {
-            color: #333;
-            font-size: 20px;
+            color: #667eea;
             margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
-        
         .tabs {
             display: flex;
             gap: 8px;
@@ -85,7 +40,6 @@
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 12px;
         }
-        
         .tab {
             padding: 10px 20px;
             border: none;
@@ -95,124 +49,167 @@
             font-weight: 500;
             transition: all 0.2s;
         }
-        
-        .tab:hover {
-            background: #e0e0e0;
-        }
-        
+        .tab:hover { background: #e0e0e0; }
         .tab.active {
             background: #667eea;
             color: white;
         }
-        
-        .tab-content {
-            display: none;
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
         }
-        
-        .tab-content.active {
-            display: block;
+        .tool-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
         }
-        
+        .tool-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 4px rgba(102,126,234,0.2);
+        }
+        .tool-item.blocked {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .tool-name {
+            font-weight: 500;
+            color: #333;
+        }
+        .tool-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover { background: #c82333; }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover { background: #218838; }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .status-ok {
+            background: #28a745;
+            color: white;
+        }
         .pending-item {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
             padding: 16px;
             margin-bottom: 12px;
             border-radius: 6px;
         }
-        
-        .pending-item.critical { background: #fee2e2; border-left-color: #ef4444; }
-        .pending-item.high { background: #ffedd5; border-left-color: #f97316; }
-        .pending-item.medium { background: #fef3c7; border-left-color: #f59e0b; }
-        
+        .pending-item.critical {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
         .pending-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-        
         .pending-title {
             font-weight: 600;
             color: #333;
         }
-        
         .risk-badge {
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
             font-weight: 500;
         }
-        
-        .risk-critical { background: #ef4444; color: white; }
-        .risk-high { background: #f97316; color: white; }
-        .risk-medium { background: #f59e0b; color: white; }
-        .risk-low { background: #10b981; color: white; }
-        
+        .risk-low { background: #28a745; color: white; }
+        .risk-medium { background: #ffc107; color: #333; }
+        .risk-high { background: #fd7e14; color: white; }
+        .risk-critical { background: #dc3545; color: white; }
         .pending-details {
             font-size: 14px;
             color: #666;
             margin-bottom: 12px;
         }
-        
         .pending-actions {
             display: flex;
             gap: 8px;
         }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-approve { background: #10b981; color: white; }
-        .btn-approve:hover { background: #059669; }
-        
-        .btn-deny { background: #ef4444; color: white; }
-        .btn-deny:hover { background: #dc2626; }
-        
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5568d3; }
-        
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        
-        .btn-edit { background: #f59e0b; color: white; }
-        .btn-edit:hover { background: #d97706; }
-        
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-        
-        .log-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .log-icon { font-size: 18px; }
-        
-        .log-content { flex: 1; }
-        
-        .log-time { color: #999; font-size: 12px; }
-        
         .empty-state {
             text-align: center;
             padding: 40px;
             color: #999;
         }
-        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
         .refresh-btn {
             background: #667eea;
             color: white;
@@ -221,273 +218,72 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-        }
-        
-        .refresh-btn:hover { background: #5568d3; }
-        
-        /* Risk Tools Table */
-        .tools-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 16px;
-        }
-        
-        .tools-table th,
-        .tools-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .tools-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .tools-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .tools-table .actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-header h3 {
-            color: #333;
-            font-size: 20px;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-        }
-        
-        .modal-close:hover { color: #333; }
-        
-        .form-group {
             margin-bottom: 16px;
         }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-        }
+        .refresh-btn:hover { background: #5568d3; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
-        <div class="header">
-            <h1>🛡️ ToolGuard 工具调用监控 <span style="font-size: 14px; color: #667eea;">v3.0.0</span></h1>
-            <div class="status-bar">
-                <span class="status-indicator status-ok" id="statusIndicator">
-                    <span>🟢</span>
-                    <span id="statusText">服务运行中</span>
-                </span>
-                <span id="serviceInfo">端口：8767</span>
-                <button class="refresh-btn" onclick="refreshAll()">🔄 刷新</button>
+        <h1>🛡️ ToolGuard - 工具调用监控系统</h1>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="allowedCount">-</div>
+                <div class="stat-label">备选工具集</div>
             </div>
-            <!-- 任务监控状态 -->
-            <div id="taskMonitorStatus" style="margin-top: 16px; padding: 12px; background: #f0f4ff; border-radius: 8px; display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>📋 任务监控中</strong>
-                        <p id="currentTaskText" style="margin: 4px 0 0; color: #666; font-size: 14px;"></p>
-                        <p id="allowedToolsText" style="margin: 4px 0 0; color: #666; font-size: 13px;"></p>
-                    </div>
-                    <button class="btn btn-danger btn-small" onclick="stopTaskMonitoring()">⏹️ 停止监控</button>
-                </div>
+            <div class="stat-card">
+                <div class="stat-value" id="blockedCount">-</div>
+                <div class="stat-label">禁止工具集</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingCount">-</div>
+                <div class="stat-label">待确认请求</div>
             </div>
         </div>
         
         <!-- 选项卡 -->
         <div class="card">
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('pending')">⏳ 待确认请求</button>
-                <button class="tab" onclick="switchTab('task-monitor')">📋 任务监控</button>
-                <button class="tab" onclick="switchTab('risk-tools')">🛡️ Risk Tools 管理</button>
-                <button class="tab" onclick="switchTab('audit')">📋 审计日志</button>
+                <button class="tab active" onclick="switchTab('task-monitor')">📋 任务监控</button>
+                <button class="tab" onclick="switchTab('tool-sets')">🔧 工具集管理</button>
+                <button class="tab" onclick="switchTab('pending')">⏳ 待确认请求</button>
+            </div>
+            
+            <!-- 任务监控 -->
+            <div id="tab-task-monitor" class="tab-content active">
+                <h2>当前任务状态</h2>
+                <div id="taskStatus">
+                    <div class="empty-state">加载中...</div>
+                </div>
+                
+                <h2 style="margin-top: 32px;">备选工具集（直接执行）</h2>
+                <div class="tool-grid" id="taskAllowedTools"></div>
+                
+                <h2 style="margin-top: 32px;">禁止工具集（需要确认）</h2>
+                <div class="tool-grid" id="taskBlockedTools"></div>
+            </div>
+            
+            <!-- 工具集管理 -->
+            <div id="tab-tool-sets" class="tab-content">
+                <h2>备选工具集（直接执行）</h2>
+                <div class="tool-grid" id="allowedTools"></div>
+                
+                <h2 style="margin-top: 32px;">禁止工具集（需要确认）</h2>
+                <div class="tool-grid" id="blockedTools"></div>
             </div>
             
             <!-- 待确认请求 -->
-            <div id="tab-pending" class="tab-content active">
+            <div id="tab-pending" class="tab-content">
+                <button class="refresh-btn" onclick="loadPending()">🔄 刷新</button>
                 <div id="pendingList">
                     <div class="empty-state">加载中...</div>
                 </div>
             </div>
-            
-            <!-- 任务监控 -->
-            <div id="tab-task-monitor" class="tab-content">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: #333; margin-bottom: 12px;">📋 启动任务监控</h3>
-                    <div style="display: flex; gap: 12px;">
-                        <input type="text" id="taskInput" placeholder="输入任务描述，如：发送天气预报邮件到 zhenxingniu06@gmail.com" 
-                               style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                        <button class="btn btn-primary" onclick="startTaskMonitoring()">🚀 启动监控</button>
-                    </div>
-                </div>
-                
-                <div id="taskMonitorInfo" style="display: none;">
-                    <h4 style="color: #333; margin-bottom: 12px;">当前任务状态</h4>
-                    <div style="background: #f0f4ff; padding: 16px; border-radius: 8px;">
-                        <p><strong>任务：</strong><span id="taskInfoText"></span></p>
-                        <p><strong>备选工具集：</strong><span id="allowedToolsInfo"></span></p>
-                        <p style="margin-top: 12px;">
-                            <button class="btn btn-danger btn-small" onclick="stopTaskMonitoring()">⏹️ 停止监控</button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Risk Tools 管理 -->
-            <div id="tab-risk-tools" class="tab-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <h3 style="color: #333;">危险工具列表</h3>
-                    <button class="btn btn-primary" onclick="openAddModal()">➕ 添加 Risk Tool</button>
-                </div>
-                <div id="riskToolsList">
-                    <div class="empty-state">加载中...</div>
-                </div>
-            </div>
-            
-            <!-- 审计日志 -->
-            <div id="tab-audit" class="tab-content">
-                <div id="auditLog">
-                    <div class="empty-state">加载中...</div>
-                </div>
-            </div>
         </div>
     </div>
-    
-    <!-- 添加/编辑 Risk Tool 模态框 -->
-    <div id="riskToolModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">添加 Risk Tool</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <form id="riskToolForm" onsubmit="saveRiskTool(event)">
-                <input type="hidden" id="editOldToolName">
-                <input type="hidden" id="editOldAction">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="toolName">工具名称 *</label>
-                        <input type="text" id="toolName" required placeholder="如：message, exec, browser">
-                    </div>
-                    <div class="form-group">
-                        <label for="toolAction">动作 *</label>
-                        <input type="text" id="toolAction" required placeholder="如：send, * (所有动作)">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="riskLevel">风险等级 *</label>
-                        <select id="riskLevel" required>
-                            <option value="low">🟢 Low (低风险)</option>
-                            <option value="medium">🟡 Medium (中风险)</option>
-                            <option value="high">🟠 High (高风险)</option>
-                            <option value="critical">🔴 Critical (严重风险)</option>
-                        </select>
-                    </div>
-                    <div class="form-group checkbox-group">
-                        <input type="checkbox" id="requireConfirmation" checked>
-                        <label for="requireConfirmation">需要确认</label>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="reason">原因 *</label>
-                    <textarea id="reason" required placeholder="说明为什么这个工具需要被监控"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="examples">示例 (可选)</label>
-                    <textarea id="examples" placeholder="每行一个示例，如：发送邮件&#10;发送消息"></textarea>
-                </div>
-                
-                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
-                    <button type="button" class="btn" onclick="closeModal()">取消</button>
-                    <button type="submit" class="btn btn-primary">保存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
+
     <script src="app.js"></script>
 </body>
 </html>

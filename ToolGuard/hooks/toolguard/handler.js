@@ -2,7 +2,7 @@
  * ToolGuard Hook Handler
  * 
  * 在工具调用前拦截并请求用户确认
- * 处理 tool:call 事件
+ * 处理 tool:call 和 message:received 事件
  */
 
 const http = require('http');
@@ -13,6 +13,52 @@ const TIMEOUT = 5000;
 
 const log = (msg) => console.log(`[toolguard] ${msg}`);
 const error = (msg) => console.error(`[toolguard] ${msg}`);
+
+/**
+ * 通知 ToolGuard 服务更新当前任务
+ */
+function updateTask(content, channel) {
+    const postData = JSON.stringify({
+        task: content,
+        channel: channel || 'unknown',
+    });
+
+    const options = {
+        hostname: TOOLGUARD_HOST,
+        port: TOOLGUARD_PORT,
+        path: '/api/task/update',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData),
+        },
+        timeout: TIMEOUT,
+    };
+
+    const req = http.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+            try {
+                log(`任务已更新：${content}`);
+            } catch (e) {
+                error(`解析响应失败：${e.message}`);
+            }
+        });
+    });
+
+    req.on('error', (e) => {
+        error(`更新任务失败：${e.message}`);
+    });
+
+    req.on('timeout', () => {
+        error('更新任务超时');
+        req.destroy();
+    });
+
+    req.write(postData);
+    req.end();
+}
 
 /**
  * 调用 ToolGuard 服务进行检查
@@ -73,7 +119,19 @@ function checkToolCall(toolName, action, parameters) {
 const handler = async (event) => {
     const { type, action, context } = event;
     
-    // 只处理 before_tool_call 事件
+    // 处理 message:received 事件（更新当前任务）
+    if (type === 'message' && action === 'received') {
+        const content = context?.content || context?.command || '';
+        const channel = context?.channel || context?.channelId || 'unknown';
+        
+        if (content && content.trim()) {
+            log(`收到消息 from=${channel}: ${content.substring(0, 50)}`);
+            updateTask(content, channel);
+        }
+        return null;
+    }
+    
+    // 处理 before_tool_call 事件（工具调用确认）
     if (type !== 'tool' || action !== 'before_tool_call') {
         return null;
     }

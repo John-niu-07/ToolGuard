@@ -134,29 +134,6 @@
       ]
     },
     {
-      "tool_name": "himalaya",
-      "action": "*",
-      "risk_level": "high",
-      "reason": "发送邮件，可能发送未授权内容",
-      "require_confirmation": true,
-      "examples": [
-        "发送邮件",
-        "回复邮件",
-        "转发邮件"
-      ]
-    },
-    {
-      "tool_name": "gog",
-      "action": "gmail_send",
-      "risk_level": "high",
-      "reason": "通过 Gmail 发送邮件，可能发送未授权内容",
-      "require_confirmation": true,
-      "examples": [
-        "发送邮件",
-        "自动回复"
-      ]
-    },
-    {
       "tool_name": "git",
       "action": "push",
       "risk_level": "critical",
@@ -201,14 +178,6 @@
       "action": "request",
       "risk_level": "medium",
       "reason": "网络请求可能泄露数据",
-      "require_confirmation": true,
-      "examples": []
-    },
-    {
-      "tool_name": "mail-send",
-      "action": "send",
-      "risk_level": "high",
-      "reason": "发送邮件，可能发送未授权内容",
       "require_confirmation": true,
       "examples": []
     },
@@ -258,6 +227,64 @@
       "reason": "trash: 删除文件到回收站",
       "require_confirmation": true,
       "examples": []
+    },
+    {
+      "tool_name": "himalaya",
+      "action": "*",
+      "risk_level": "high",
+      "reason": "himalaya: 用户从安全工具列表移除",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "gog",
+      "action": "*",
+      "risk_level": "high",
+      "reason": "gog: 用户从安全工具列表移除",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "mail-send",
+      "action": "*",
+      "risk_level": "high",
+      "reason": "mail-send: 用户从安全工具列表移除",
+      "require_confirmation": true,
+      "examples": []
+    },
+    {
+      "tool_name": "send_email",
+      "action": "send",
+      "risk_level": "high",
+      "reason": "send_email.py: 发送邮件工具，可能发送未授权内容",
+      "require_confirmation": true,
+      "examples": [
+        "发送邮件到 test@example.com",
+        "把文件通过邮件发送"
+      ]
+    },
+    {
+      "tool_name": "email-send",
+      "action": "send",
+      "risk_level": "high",
+      "reason": "email-send: 发送邮件工具，可能发送未授权或敏感内容",
+      "require_confirmation": true,
+      "examples": [
+        "发送邮件到 test@example.com",
+        "把文件通过邮件发送",
+        "发送文件内容到邮箱"
+      ]
+    },
+    {
+      "tool_name": "canvas",
+      "action": "*",
+      "risk_level": "medium",
+      "reason": "canvas: 画布操作，可能打开浏览器",
+      "require_confirmation": true,
+      "examples": [
+        "打开画布",
+        "导航到网页"
+      ]
     }
   ],
   "safe_tools": [
@@ -280,11 +307,6 @@
     {
       "tool_name": "memory_get",
       "reason": "获取记忆片段（只读操作）"
-    },
-    {
-      "tool_name": "browser",
-      "action": "snapshot",
-      "reason": "浏览器快照（只读操作）"
     },
     {
       "tool_name": "feishu_doc",
