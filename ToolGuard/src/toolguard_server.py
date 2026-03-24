@@ -217,15 +217,30 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
             success = guard.respond_confirmation(confirmation_id, approved)
             
             if success:
+                if not approved:
+                    # 用户拒绝了工具调用，清理所有待确认请求
+                    guard.pending_confirmations['pending'] = []
+                    guard._save_pending_confirmations()
+                    guard._log("用户拒绝了工具调用，已清理所有待确认请求")
+                
                 self.send_json({
                     "success": True,
                     "approved": approved,
+                    "task_ended": not approved,
                 })
             else:
                 self.send_json({
                     "success": False,
                     "error": "Confirmation not found or already processed",
                 }, 400)
+        
+        # 清理待确认请求
+        elif self.path == '/api/pending/clear':
+            cleared = guard.clear_pending_confirmations()
+            self.send_json({
+                "success": True,
+                "cleared": cleared,
+            })
         
         # 更新当前任务
         elif self.path == '/api/task/update':
@@ -242,6 +257,16 @@ class ToolGuardHandler(BaseHTTPRequestHandler):
             channel = data.get('channel', 'unknown')
             
             if guard:
+                # 只有当任务内容不是"确认"时，才清理临时允许列表
+                # 这样用户说"确认"时，可以正常使用已确认的工具
+                # 但用户说其他内容（如"测试"）时，清理临时允许列表防止工具被意外执行
+                if task.strip() != '确认':
+                    pending_count = len(guard.pending_confirmations.get('pending', []))
+                    if pending_count > 0 and guard.temp_allowed:
+                        cleared_count = len(guard.temp_allowed)
+                        guard.temp_allowed.clear()
+                        guard._log(f"已清理 {cleared_count} 个临时允许（任务：{task}）")
+                
                 guard.update_current_task(task, channel)
             
             self.send_json({

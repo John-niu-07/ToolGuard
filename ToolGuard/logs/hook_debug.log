@@ -1,0 +1,3 @@
+2026-03-24 09:01:21 | [DEBUG] 收到事件：{"toolName":"browser","action":"open","params":{"url":"test"}}
+2026-03-24 09:01:21 | 检查工具调用：browser.open
+2026-03-24 09:01:21 | ⚠️ 需要确认：browser.open
