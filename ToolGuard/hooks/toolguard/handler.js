@@ -6,13 +6,30 @@
  */
 
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const TOOLGUARD_HOST = '127.0.0.1';
 const TOOLGUARD_PORT = 8767;
 const TIMEOUT = 5000;
 
-const log = (msg) => console.log(`[toolguard] ${msg}`);
-const error = (msg) => console.error(`[toolguard] ${msg}`);
+const log = (msg) => {
+    console.log(`[toolguard] ${msg}`);
+    // 同时写入独立日志文件
+    const logFile = path.join(__dirname, '../../logs/hook_debug.log');
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    try {
+        fs.appendFileSync(logFile, `${timestamp} | ${msg}\n`);
+    } catch(e) {}
+};
+const error = (msg) => {
+    console.error(`[toolguard] ${msg}`);
+    const logFile = path.join(__dirname, '../../logs/hook_debug.log');
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    try {
+        fs.appendFileSync(logFile, `${timestamp} | ERROR: ${msg}\n`);
+    } catch(e) {}
+};
 
 /**
  * 通知 ToolGuard 服务更新当前任务
@@ -57,6 +74,47 @@ function updateTask(content, channel) {
     });
 
     req.write(postData);
+    req.end();
+}
+
+/**
+ * 清理待确认请求 - 当用户输入新内容时调用
+ */
+function clearPendingConfirmations() {
+    const options = {
+        hostname: TOOLGUARD_HOST,
+        port: TOOLGUARD_PORT,
+        path: '/api/pending/clear',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        timeout: TIMEOUT,
+    };
+
+    const req = http.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+            try {
+                const result = JSON.parse(data);
+                if (result.cleared > 0) {
+                    log(`✅ 已清理 ${result.cleared} 个待确认请求`);
+                }
+            } catch (e) {
+                // 忽略
+            }
+        });
+    });
+
+    req.on('error', () => {
+        // 忽略错误
+    });
+
+    req.on('timeout', () => {
+        req.destroy();
+    });
+
     req.end();
 }
 
@@ -115,34 +173,82 @@ function checkToolCall(toolName, action, parameters) {
 
 /**
  * Hook 处理器
+ * 
+ * Gateway 传递的事件格式：
+ * - before_tool_call: { toolName, action, params, toolCallId, runId, ... }
+ * - message:received: { content, channel, ... }
  */
 const handler = async (event) => {
-    const { type, action, context } = event;
+    // 调试：记录所有事件
+    log(`[DEBUG] 收到事件：${JSON.stringify(event)}`);
     
-    // 处理 message:received 事件（更新当前任务）
-    if (type === 'message' && action === 'received') {
-        const content = context?.content || context?.command || '';
-        const channel = context?.channel || context?.channelId || 'unknown';
+    // 检查是否是 message:received 事件
+    const eventType = event.type || event.event || '';
+    const eventAction = event.action || '';
+    
+    log(`[DEBUG] eventType=${eventType}, eventAction=${eventAction}, hasContent=${event.content !== undefined}, hasToolName=${event.toolName !== undefined}`);
+    
+    // 处理 message:received 事件 - 用户输入新消息时清理待确认请求
+    // 支持多种事件格式：{type:'message',action:'received'} 或 {event:'message:received'}
+    if ((eventType === 'message' && eventAction === 'received') || 
+        eventType === 'message:received' ||
+        (event.content !== undefined && !event.toolName && !event.tool_name)) {
         
-        if (content && content.trim()) {
-            log(`收到消息 from=${channel}: ${content.substring(0, 50)}`);
-            updateTask(content, channel);
+        const content = event.content || event.command || '';
+        const channel = event.channel || event.channelId || 'unknown';
+        
+        log(`[DEBUG] 收到消息 from=${channel}: ${content.substring(0, 50)}`);
+        
+        // 更新任务并清理待确认请求
+        updateTask(content, channel);
+        
+        // 清理待确认请求和临时允许列表
+        clearPendingConfirmations();
+        
+        return null;
+    }
+    
+    // Gateway 直接传递工具调用参数，不是包装的事件对象
+    // 检查是否有 toolName 字段来判断是否是工具调用
+    const toolName = event.toolName || event.tool_name || '';
+    
+    // 如果是工具调用（有 toolName 字段）
+    if (toolName) {
+        const toolAction = event.action || '*';
+        const parameters = event.params || event.parameters || {};
+        
+        log(`[DEBUG] 检查工具调用：${toolName}.${toolAction}`);
+
+        try {
+            const result = await checkToolCall(toolName, toolAction, parameters);
+
+            if (result.need_confirmation) {
+                log(`⚠️ 需要确认：${toolName}.${toolAction}`);
+                
+                // 返回确认请求 - Gateway 期望的格式
+                return {
+                    block: true,
+                    blockReason: result.message || `需要确认：${toolName}.${toolAction}`,
+                    confirmation_id: result.confirmation_id,
+                };
+            }
+
+            log(`✅ 放行：${toolName}.${toolAction}`);
+            return null;
+
+        } catch (err) {
+            error(`错误：${err.message}`);
+            // Fail-closed: 出错时阻止
+            return {
+                block: true,
+                blockReason: err.message || 'ToolGuard 错误',
+            };
         }
-        return null;
     }
     
-    // 处理 before_tool_call 事件（工具调用确认）
-    if (type !== 'tool' || action !== 'before_tool_call') {
-        return null;
-    }
-    
-    const toolName = context?.tool_name || context?.tool || '';
-    const toolAction = context?.action || '*';
-    const parameters = context?.parameters || {};
-    
-    if (!toolName) {
-        return null;
-    }
+    // 非工具调用事件，放行
+    log(`[DEBUG] 未知事件类型，放行`);
+    return null;
 
     log(`检查工具调用：${toolName}.${toolAction}`);
 

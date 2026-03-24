@@ -235,7 +235,11 @@ class ToolGuard:
                     self.add_temp_allowed(tool_name, duration_seconds=120)
                     self._log(f"✅ 已批准确认请求：{confirmation_id}，工具 {tool_name} 临时允许 2 分钟")
                 else:
-                    self._log(f"❌ 已拒绝确认请求：{confirmation_id}")
+                    # 拒绝时清理临时允许列表，确保工具不会被执行
+                    tool_name = confirmation['tool_name']
+                    if tool_name in self.temp_allowed:
+                        del self.temp_allowed[tool_name]
+                    self._log(f"❌ 已拒绝确认请求：{confirmation_id}，工具 {tool_name} 已被拒绝")
                 
                 return True
         
@@ -286,6 +290,34 @@ class ToolGuard:
     
     def update_current_task(self, task: str, channel: str = 'unknown'):
         """更新当前任务"""
+        self.current_task = task
+        self.task_mode = True
+        self._log(f"更新当前任务 from {channel}: {task}")
+        self._save_config()
+    
+    def clear_pending_confirmations(self) -> int:
+        """清理所有待确认请求 - 当用户输入新内容时调用"""
+        pending_count = len(self.pending_confirmations.get('pending', []))
+        
+        if pending_count > 0:
+            # 真正从 pending 列表中删除所有待确认请求（不只是标记为 cancelled）
+            self.pending_confirmations['pending'] = []
+            
+            self._save_pending_confirmations()
+            self._log(f"已清理 {pending_count} 个待确认请求（用户输入新内容）")
+        
+        # 同时清理临时允许列表 - 防止工具被意外放行
+        if self.temp_allowed:
+            cleared_count = len(self.temp_allowed)
+            self.temp_allowed.clear()
+            self._log(f"已清理 {cleared_count} 个临时允许（用户输入新内容）")
+        
+        return pending_count
+    
+    def update_current_task(self, task: str, channel: str = 'unknown'):
+        """更新当前任务 - 不清理临时允许列表"""
+        # 注意：这里不清理临时允许列表
+        # 临时允许列表只在超时后过期，或者有待确认请求且用户输入新内容时才清理
         self.current_task = task
         self.task_mode = True
         self._log(f"更新当前任务 from {channel}: {task}")

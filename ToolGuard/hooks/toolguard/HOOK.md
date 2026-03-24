@@ -6,7 +6,7 @@ metadata:
     "openclaw":
       {
         "emoji": "🛡️",
-        "events": ["tool:call"],
+        "events": ["message:received"],
         "install": [{ "id": "toolguard", "kind": "local", "label": "Local hook" }],
       },
   }
